@@ -1,0 +1,55 @@
+---
+title: "Titanic Data Wrangling Exercise"
+author: "Laura Rose"
+date: "May 23, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+## Load libraries
+
+```{r}
+library(tidyr)
+library(dplyr)
+```
+## Step 0: Load the Data in RStudio
+
+```{r}
+titanic_original <- read.csv("C:/Users/laura.rose/Documents/titanic_original.csv")
+```
+
+## Step 1: Port of Embarkation
+
+replace missing values in embarked variable 
+
+
+```{r}
+titanic_original$embarked <- with(titanic_original, replace(embarked, embarked=="", "S"))
+```
+
+## Step 2: Age
+```{r}
+mean_age <- mean(titanic_original$age, na.rm = TRUE)
+titanic_original$age <- replace(titanic_original$age, is.na(titanic_original$age), mean_age)
+```
+Another replacement for the missing values could be the median. This might be more representative of the passengers since the mean is affected by outliers.
+
+## Step 3: Lifeboat
+```{r}
+titanic_original <- mutate(titanic_original, boat = ifelse(trimws(titanic_original$boat)=="", "None", boat))
+```
+
+## Step 4: 
+It would not be useful to replace a missing value for a cabin number because the actual combination of numbers and letters for a given cabin is not important, but rather whether it is known which cabin a passenger had. A missing value could imply that the passenger didn't survive, so nobody after the sinking of the ship knew their cabin number.
+
+```{r}
+titanic_original <- mutate(titanic_original, has_cabin_number = as.numeric(trimws(titanic_original$cabin)!=""))
+```
+
+## Step 5: Write the cleaned-up data to a CSV
+
+```{r}
+write.csv(titanic_original, "C:/Users/laura.rose/Documents/titanic_clean.csv")
+```
